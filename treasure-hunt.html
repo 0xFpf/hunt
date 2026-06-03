@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPERANT // TREASURE PROTOCOL</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#080c08;
+  --bg2:#0c110c;
+  --bg3:#111811;
+  --red:#cc2200;
+  --red-dim:#8a1800;
+  --red-bright:#ff3300;
+  --green:#00cc44;
+  --green-dim:#006622;
+  --green-bright:#00ff55;
+  --amber:#ffaa00;
+  --amber-dim:#aa6600;
+  --cyan:#00cccc;
+  --cyan-dim:#007777;
+  --white:#c8d4c0;
+  --muted:#4a6044;
+  --border-red:1px solid #cc2200;
+  --border-green:1px solid #006622;
+  --border-dim:1px solid #1e2e1e;
+  --mono:'Share Tech Mono',monospace;
+  --vt:'VT323',monospace;
+}
+
+html,body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:var(--mono);
+  font-size:13px;
+  line-height:1.5;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0.18) 4px);
+  pointer-events:none;z-index:9999;
+}
+
+/* ── TICKER BAR ── */
+.ticker-wrap{
+  background:#0a0e0a;
+  border-bottom:var(--border-red);
+  overflow:hidden;
+  height:22px;
+  display:flex;
+  align-items:center;
+}
+.ticker-inner{
+  display:flex;
+  gap:0;
+  white-space:nowrap;
+  animation:tickScroll 30s linear infinite;
+  color:var(--green);
+  font-size:11px;
+}
+.ticker-inner span{margin-right:40px;}
+.ticker-inner .red{color:var(--red-bright);}
+.ticker-inner .amber{color:var(--amber);}
+.ticker-inner .cyan{color:var(--cyan);}
+@keyframes tickScroll{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+
+/* ── TOP NAV ── */
+.topnav{
+  background:#0a0e0a;
+  border-bottom:var(--border-red);
+  padding:4px 12px;
+  display:flex;
+  align-items:center;
+  gap:0;
+  justify-content:space-between;
+}
+.topnav-left{display:flex;align-items:center;gap:12px;}
+.logo{
+  font-family:var(--vt);
+  font-size:22px;
+  color:var(--red-bright);
+  letter-spacing:0.05em;
+  line-height:1;
+}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.2em;}
+.nav-pills{display:flex;gap:6px;}
+.pill{
+  font-size:11px;
+  padding:2px 10px;
+  border:1px solid var(--muted);
+  color:var(--muted);
+  cursor:pointer;
+  letter-spacing:0.1em;
+}
+.pill.active{border-color:var(--green);color:var(--green);background:rgba(0,204,68,0.08);}
+.pill.red-pill{border-color:var(--red);color:var(--red);background:rgba(204,34,0,0.08);}
+.topnav-right{
+  font-size:11px;
+  color:var(--amber);
+  letter-spacing:0.15em;
+}
+.status-dot{
+  display:inline-block;width:7px;height:7px;
+  border-radius:50%;background:var(--green);
+  margin-right:6px;
+  animation:blink 1.4s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.1;}}
+
+/* ── MAIN GRID ── */
+.main{padding:10px;display:grid;grid-template-columns:1fr;gap:10px;}
+
+/* ── PANEL ── */
+.panel{
+  background:var(--bg2);
+  border:var(--border-red);
+  position:relative;
+}
+.panel.green-border{border-color:var(--green-dim);}
+.panel.amber-border{border-color:var(--amber-dim);}
+.panel.cyan-border{border-color:var(--cyan-dim);}
+
+.panel-header{
+  background:#0a0e0a;
+  border-bottom:var(--border-red);
+  padding:4px 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.panel.green-border .panel-header{border-bottom-color:var(--green-dim);}
+.panel.amber-border .panel-header{border-bottom-color:var(--amber-dim);}
+.panel.cyan-border .panel-header{border-bottom-color:var(--cyan-dim);}
+
+.panel-dot{
+  width:8px;height:8px;
+  background:var(--red-bright);
+  flex-shrink:0;
+}
+.panel.green-border .panel-dot{background:var(--green);}
+.panel.amber-border .panel-dot{background:var(--amber);}
+.panel.cyan-border .panel-dot{background:var(--cyan);}
+
+.panel-title{
+  font-size:12px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--red-bright);
+}
+.panel.green-border .panel-title{color:var(--green);}
+.panel.amber-border .panel-title{color:var(--amber);}
+.panel.cyan-border .panel-title{color:var(--cyan);}
+
+.panel-body{padding:14px;}
+
+/* ── HEADER PANEL ── */
+.header-panel{
+  text-align:center;
+  padding:28px 20px 24px;
+  border:var(--border-red);
+  background:var(--bg2);
+  position:relative;
+  overflow:hidden;
+}
+.header-panel::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(204,34,0,0.025) 60px,rgba(204,34,0,0.025) 61px);
+}
+.header-eyebrow{
+  font-size:11px;letter-spacing:0.35em;color:var(--muted);
+  margin-bottom:12px;
+  text-transform:uppercase;
+}
+.header-title{
+  font-family:var(--vt);
+  font-size:clamp(28px,5vw,52px);
+  color:var(--red-bright);
+  letter-spacing:0.06em;
+  line-height:1.1;
+  text-transform:uppercase;
+}
+.header-title .line2{color:var(--green-bright);}
+.header-underline{
+  width:200px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red-bright),transparent);
+  margin:16px auto;
+}
+.header-meta{
+  font-size:11px;color:var(--muted);letter-spacing:0.2em;
+  display:flex;gap:24px;justify-content:center;flex-wrap:wrap;
+}
+.header-meta span{color:var(--green);margin-left:4px;}
+
+/* ── CUBE ── */
+.cube-section{
+  display:flex;flex-direction:column;align-items:center;
+  padding:24px 0 16px;
+  border:var(--border-red);
+  background:var(--bg2);
+  gap:16px;
+}
+.cube-scene{perspective:500px;}
+.cube-el{
+  width:80px;height:80px;
+  position:relative;
+  transform-style:preserve-3d;
+  animation:spin3d 10s linear infinite;
+}
+@keyframes spin3d{
+  0%{transform:rotateX(0) rotateY(0);}
+  100%{transform:rotateX(360deg) rotateY(360deg);}
+}
+.face{
+  position:absolute;width:80px;height:80px;
+  border:1px solid var(--red);
+  background:rgba(204,34,0,0.04);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--vt);font-size:28px;color:var(--red-bright);
+}
+.face.f{transform:translateZ(40px);}
+.face.ba{transform:rotateY(180deg) translateZ(40px);border-color:var(--green);color:var(--green-bright);}
+.face.r{transform:rotateY(90deg) translateZ(40px);border-color:var(--amber);color:var(--amber);}
+.face.l{transform:rotateY(-90deg) translateZ(40px);border-color:var(--cyan);color:var(--cyan);}
+.face.t{transform:rotateX(90deg) translateZ(40px);}
+.face.bo{transform:rotateX(-90deg) translateZ(40px);border-color:var(--green);color:var(--green-bright);}
+.cube-label{
+  font-size:11px;color:var(--muted);letter-spacing:0.25em;
+  text-transform:uppercase;
+  animation:blink 2s step-end infinite;
+}
+
+/* ── FORM ── */
+.field{margin-bottom:14px;}
+.field label{
+  display:block;font-size:11px;letter-spacing:0.2em;
+  color:var(--muted);text-transform:uppercase;margin-bottom:5px;
+}
+.field label::before{content:'> ';color:var(--green);}
+
+input[type=text]{
+  width:100%;
+  background:#080c08;
+  border:1px solid #1e2e1e;
+  border-left:2px solid var(--green-dim);
+  color:var(--green-bright);
+  font-family:var(--mono);
+  font-size:13px;
+  padding:6px 10px;
+  outline:none;
+  transition:border-color 0.15s;
+  caret-color:var(--green-bright);
+}
+input[type=text]::placeholder{color:var(--muted);opacity:0.6;}
+input[type=text]:focus{border-color:var(--green);border-left-color:var(--green-bright);}
+
+.member-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.member-row input{flex:1;}
+.member-num{
+  font-size:11px;color:var(--muted);width:22px;flex-shrink:0;
+  text-align:right;line-height:30px;
+}
+
+.btn{
+  background:transparent;
+  border:1px solid var(--green-dim);
+  color:var(--green);
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.15em;
+  padding:6px 16px;
+  cursor:pointer;
+  text-transform:uppercase;
+  transition:background 0.15s,border-color 0.15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{background:rgba(0,204,68,0.08);border-color:var(--green);}
+.btn.btn-red{border-color:var(--red-dim);color:var(--red-bright);}
+.btn.btn-red:hover{background:rgba(204,34,0,0.08);border-color:var(--red-bright);}
+.btn.btn-amber{border-color:var(--amber-dim);color:var(--amber);}
+.btn.btn-amber:hover{background:rgba(255,170,0,0.08);border-color:var(--amber);}
+.btn-rm{
+  background:transparent;border:1px solid #1e2e1e;
+  color:var(--muted);font-family:var(--mono);
+  font-size:14px;padding:0;width:26px;height:26px;
+  cursor:pointer;flex-shrink:0;
+  transition:border-color 0.15s,color 0.15s;
+  line-height:24px;text-align:center;
+}
+.btn-rm:hover{border-color:var(--red);color:var(--red-bright);}
+
+.add-member-btn{
+  width:100%;margin-top:8px;
+  background:transparent;
+  border:1px dashed var(--green-dim);
+  color:var(--muted);
+  font-family:var(--mono);font-size:12px;
+  letter-spacing:0.15em;padding:5px;
+  cursor:pointer;text-transform:uppercase;
+  transition:border-color 0.15s,color 0.15s;
+}
+.add-member-btn:hover{border-color:var(--green);color:var(--green);}
+
+.confirm-msg{
+  display:none;margin-top:12px;
+  border-left:2px solid var(--green-bright);
+  padding:6px 12px;
+  font-size:12px;color:var(--green-bright);
+  background:rgba(0,204,68,0.04);
+  letter-spacing:0.1em;
+}
+
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:640px){.two-col{grid-template-columns:1fr;}}
+
+/* ── RIDDLE ── */
+.riddle-body{
+  font-family:var(--vt);
+  font-size:20px;
+  color:var(--white);
+  line-height:1.7;
+  padding:10px 0;
+}
+.riddle-body .emph{color:var(--amber);}
+.riddle-line{
+  display:block;
+  padding-left:16px;
+  position:relative;
+}
+.riddle-line::before{
+  content:'';
+  position:absolute;left:0;top:50%;
+  width:6px;height:1px;
+  background:var(--red-dim);
+}
+.riddle-hint{
+  margin-top:14px;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:0.15em;
+  border-top:var(--border-dim);
+  padding-top:10px;
+}
+.riddle-hint::before{content:'// ';}
+.riddle-hint::after{content:' //';}
+
+/* ── CIPHER ── */
+.cipher-body{
+  display:flex;flex-direction:column;gap:14px;
+}
+.cipher-desc{
+  font-size:12px;color:var(--muted);letter-spacing:0.08em;line-height:1.8;
+}
+.cipher-desc .green{color:var(--green);}
+.cipher-link{
+  display:inline-block;
+  color:var(--amber);
+  font-size:12px;
+  letter-spacing:0.15em;
+  text-decoration:none;
+  border-bottom:1px solid var(--amber-dim);
+  padding-bottom:1px;
+  transition:border-color 0.15s;
+}
+.cipher-link:hover{border-color:var(--amber);}
+.cipher-link::before{content:'[OPEN] ';}
+.spin-glyph{
+  font-family:var(--vt);font-size:36px;
+  color:var(--amber-dim);
+  display:block;
+  animation:spinY 6s linear infinite;
+}
+@keyframes spinY{
+  0%{transform:rotateY(0deg);}
+  100%{transform:rotateY(360deg);}
+}
+
+/* ── TREASURE BUTTON ── */
+.treasure-section{
+  border:1px solid var(--red);
+  background:var(--bg2);
+  padding:28px 20px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.treasure-section::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(204,34,0,0.02) 8px,rgba(204,34,0,0.02) 9px);
+}
+.treasure-warn{
+  font-size:11px;color:var(--muted);letter-spacing:0.2em;
+  margin-bottom:20px;text-transform:uppercase;
+}
+.btn-treasure{
+  background:transparent;
+  border:1px solid var(--red-bright);
+  color:var(--red-bright);
+  font-family:var(--vt);
+  font-size:22px;
+  letter-spacing:0.12em;
+  padding:10px 32px;
+  cursor:pointer;
+  text-transform:uppercase;
+  transition:background 0.2s,color 0.2s;
+  position:relative;
+  animation:treasurePulse 3s ease-in-out infinite;
+}
+@keyframes treasurePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,51,0,0.3);}
+  50%{box-shadow:0 0 14px 4px rgba(255,51,0,0.12);}
+}
+.btn-treasure:hover{background:rgba(204,34,0,0.12);}
+.treasure-sub{
+  font-size:11px;color:var(--muted);letter-spacing:0.18em;
+  margin-top:12px;
+}
+
+/* ── MODAL OVERLAY (in-flow) ── */
+.modal-wrap{
+  display:none;
+  position:fixed;inset:0;z-index:800;
+  background:rgba(4,6,4,0.94);
+  align-items:center;justify-content:center;
+}
+.modal-wrap.open{display:flex;}
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--red-bright);
+  max-width:400px;width:90%;
+  position:relative;
+}
+.modal-header{
+  background:#0a0e0a;
+  border-bottom:1px solid var(--red);
+  padding:6px 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.modal-header-dot{width:8px;height:8px;background:var(--red-bright);flex-shrink:0;}
+.modal-header-title{
+  font-size:12px;letter-spacing:0.2em;
+  color:var(--red-bright);text-transform:uppercase;flex:1;
+}
+.modal-close{
+  background:transparent;border:none;
+  color:var(--muted);font-size:16px;
+  cursor:pointer;font-family:var(--mono);
+  padding:0;line-height:1;
+}
+.modal-close:hover{color:var(--red-bright);}
+.modal-body{padding:18px;}
+.modal-sub{
+  font-size:11px;color:var(--muted);letter-spacing:0.1em;
+  margin-bottom:16px;line-height:1.7;
+}
+.modal-sub::before{content:'// ';}
+
+.modal-success{
+  display:none;
+  padding:28px 18px;text-align:center;
+}
+.modal-success-glyph{
+  font-family:var(--vt);font-size:52px;color:var(--green-bright);
+  display:block;margin-bottom:10px;
+}
+.modal-success-title{
+  font-family:var(--vt);font-size:24px;
+  color:var(--green-bright);letter-spacing:0.15em;
+  text-transform:uppercase;
+}
+.modal-success-sub{
+  font-size:11px;color:var(--muted);
+  margin-top:10px;letter-spacing:0.12em;
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:var(--border-red);
+  padding:8px 12px;
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--muted);letter-spacing:0.2em;
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker-inner">
+    <span>COORD <span class="green">51.507°N 0.127°W</span></span>
+    <span>STATUS <span class="red">ACTIVE HUNT</span></span>
+    <span>OPERATIVES <span class="amber">UNKNOWN</span></span>
+    <span>CIPHER <span class="cyan">LEVEL 3</span></span>
+    <span>OBJECT <span class="green">UNRECOVERED</span></span>
+    <span>TIMER <span class="red">RUNNING</span></span>
+    <span>SIGNAL <span class="amber">WEAK</span></span>
+    <span>THREAT <span class="red">MODERATE</span></span>
+    <span>NODE <span class="cyan">7 OF 7 LOCKED</span></span>
+    <span>COORD <span class="green">51.507°N 0.127°W</span></span>
+    <span>STATUS <span class="red">ACTIVE HUNT</span></span>
+    <span>OPERATIVES <span class="amber">UNKNOWN</span></span>
+    <span>CIPHER <span class="cyan">LEVEL 3</span></span>
+    <span>OBJECT <span class="green">UNRECOVERED</span></span>
+    <span>TIMER <span class="red">RUNNING</span></span>
+    <span>SIGNAL <span class="amber">WEAK</span></span>
+    <span>THREAT <span class="red">MODERATE</span></span>
+    <span>NODE <span class="cyan">7 OF 7 LOCKED</span></span>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <div>
+      <div class="logo">OPERANT // DATATERM</div>
+      <div class="logo-sub">v1.0 // FIELD OPERATIVE MODE</div>
+    </div>
+    <div class="nav-pills">
+      <div class="pill active">HUNT</div>
+      <div class="pill">LOG</div>
+      <div class="pill red-pill">CLAIM</div>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <span class="status-dot"></span>LIVE &nbsp;|&nbsp; DAY 001
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- HEADER PANEL -->
+  <div class="header-panel">
+    <div class="header-eyebrow">// Classified Operation — Level 5 Clearance Required //</div>
+    <div class="header-title">
+      Welcome to the<br>
+      <span class="line2">Super Secret</span><br>
+      Treasure Hunt
+    </div>
+    <div class="header-underline"></div>
+    <div class="header-meta">
+      <div>PROTOCOL <span>OMEGA-7</span></div>
+      <div>SECTOR <span>CLASSIFIED</span></div>
+      <div>OPERATIVES <span>ACTIVE</span></div>
+    </div>
+  </div>
+
+  <!-- CUBE + STATUS -->
+  <div class="two-col" style="grid-template-columns:1fr 2fr;">
+    <div class="cube-section">
+      <div class="cube-scene">
+        <div class="cube-el">
+          <div class="face f">?</div>
+          <div class="face ba">!</div>
+          <div class="face r">◈</div>
+          <div class="face l">✦</div>
+          <div class="face t">⌬</div>
+          <div class="face bo">⬡</div>
+        </div>
+      </div>
+      <div class="cube-label">[ object: unknown ]</div>
+    </div>
+
+    <div class="panel" style="border-color:var(--green-dim);">
+      <div class="panel-header" style="border-bottom-color:var(--green-dim);">
+        <div class="panel-dot" style="background:var(--green);"></div>
+        <div class="panel-title" style="color:var(--green);">System Status</div>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="border:1px solid #1e2e1e;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">HUNT STATUS</div>
+            <div style="color:var(--red-bright);font-size:16px;font-family:var(--vt);">ACTIVE</div>
+          </div>
+          <div style="border:1px solid #1e2e1e;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">TEAMS IN</div>
+            <div style="color:var(--green-bright);font-size:16px;font-family:var(--vt);" id="team-count">00</div>
+          </div>
+          <div style="border:1px solid #1e2e1e;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">CLUES ACTIVE</div>
+            <div style="color:var(--amber);font-size:16px;font-family:var(--vt);">03</div>
+          </div>
+          <div style="border:1px solid #1e2e1e;padding:8px 10px;">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">ELAPSED</div>
+            <div style="color:var(--cyan);font-size:16px;font-family:var(--vt);" id="elapsed">00:00:00</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);border-top:var(--border-dim);padding-top:10px;letter-spacing:0.1em;line-height:1.8;">
+          &gt; Operative: <span style="color:var(--green);">UNIDENTIFIED</span><br>
+          &gt; Clearance: <span style="color:var(--amber);">PENDING REGISTRATION</span><br>
+          &gt; Last node: <span style="color:var(--muted);">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRATION -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-dot"></div>
+      <div class="panel-title">Team Registration</div>
+      <span style="margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:0.2em;">SECTION 01</span>
+    </div>
+    <div class="panel-body">
+      <div class="two-col">
+        <div>
+          <div class="field">
+            <label for="team-name">Team Designation</label>
+            <input type="text" id="team-name" placeholder="Enter team callsign...">
+          </div>
+          <button class="btn" onclick="registerTeam()" style="width:100%;justify-content:center;">
+            &#9654; Confirm &amp; Register
+          </button>
+          <div class="confirm-msg" id="confirm-msg">
+            &#10003; &nbsp;Registration logged. Operative clearance: GRANTED.
+          </div>
+        </div>
+        <div>
+          <div class="field">
+            <label>Team Members</label>
+            <div id="members-list">
+              <div class="member-row">
+                <div class="member-num">01</div>
+                <input type="text" placeholder="Member name...">
+                <button class="btn-rm" onclick="removeMember(this)">−</button>
+              </div>
+            </div>
+            <button class="add-member-btn" onclick="addMember()">+ Add Operative</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIDDLE + CIPHER (side by side) -->
+  <div class="two-col">
+
+    <div class="panel amber-border">
+      <div class="panel-header">
+        <div class="panel-dot"></div>
+        <div class="panel-title">Active Directive</div>
+        <span style="margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:0.2em;">SECTION 02</span>
+      </div>
+      <div class="panel-body">
+        <div class="riddle-body">
+          <span class="riddle-line">I have cities, but no houses live there.</span>
+          <span class="riddle-line">I have mountains, but no trees grow near.</span>
+          <span class="riddle-line">I have water, but no fish swim through.</span>
+          <span class="riddle-line">I have roads, yet no car passes through.</span>
+          <span class="riddle-line">I hold the world yet weigh almost nothing —</span>
+          <span class="riddle-line emph">and the answer lies where two borders share</span>
+          <span class="riddle-line emph">a name, but never a face.</span>
+        </div>
+        <div class="riddle-hint">Start at the beginning. The beginning is where you began.</div>
+      </div>
+    </div>
+
+    <div class="panel cyan-border">
+      <div class="panel-header">
+        <div class="panel-dot"></div>
+        <div class="panel-title">Cipher Decoder</div>
+        <span style="margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:0.2em;">SECTION 03</span>
+      </div>
+      <div class="panel-body">
+        <div class="cipher-body">
+          <span class="spin-glyph" aria-hidden="true">&#9773;</span>
+          <div class="cipher-desc">
+            &gt; Some transmissions are <span class="green">NOT</span> plaintext.<br>
+            &gt; If the signal is scrambled, you will need to decode it.<br>
+            &gt; Access the external decryption node below.
+          </div>
+          <a class="cipher-link" href="https://www.dcode.fr/cipher-identifier" target="_blank" rel="noopener">
+            Cipher Identifier Tool
+          </a>
+          <div style="border-top:var(--border-dim);padding-top:12px;font-size:11px;color:var(--muted);letter-spacing:0.12em;line-height:1.8;">
+            &gt; Last decode attempt: <span style="color:var(--cyan);">—</span><br>
+            &gt; Encryption type: <span style="color:var(--amber);">UNKNOWN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TREASURE BUTTON -->
+  <div class="treasure-section">
+    <div class="treasure-warn">⚠ &nbsp; Authorised operatives only &nbsp; ⚠</div>
+    <button class="btn-treasure" onclick="openModal()">
+      &#9654; &nbsp;Only click this if you've found the treasure
+    </button>
+    <div class="treasure-sub">// Unauthorised claims will be logged and prosecuted //</div>
+  </div>
+
+</main>
+
+<footer>
+  <span>OPERANT DATATERM v1.0 // FIELD MODE</span>
+  <span>ALL ACTIVITY MONITORED // DO NOT DISTRIBUTE</span>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-wrap" id="modal-wrap">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-header-dot"></div>
+      <div class="modal-header-title">Claim Protocol — Victory Declaration</div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div id="modal-form">
+      <div class="modal-body">
+        <div class="modal-sub">State your team designation to register victory. This action is irreversible and will be logged.</div>
+        <div class="field">
+          <label for="modal-team">Team Designation</label>
+          <input type="text" id="modal-team" placeholder="Enter team callsign...">
+        </div>
+        <button class="btn btn-red" style="width:100%;justify-content:center;" onclick="submitClaim()">
+          &#9654; Submit Victory Claim
+        </button>
+      </div>
+    </div>
+    <div class="modal-success" id="modal-success">
+      <span class="modal-success-glyph">&#9670;</span>
+      <div class="modal-success-title">Victory Confirmed</div>
+      <div class="modal-success-sub">// Your conquest has been recorded, operative. Well played. //</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var memberCount = 1;
+  var teamRegistered = false;
+
+  function addMember() {
+    memberCount++;
+    var list = document.getElementById('members-list');
+    var row = document.createElement('div');
+    row.className = 'member-row';
+    row.innerHTML = '<div class="member-num">' + String(memberCount).padStart(2,'0') + '</div>' +
+      '<input type="text" placeholder="Member name...">' +
+      '<button class="btn-rm" onclick="removeMember(this)">−</button>';
+    list.appendChild(row);
+    renumberMembers();
+  }
+
+  function removeMember(btn) {
+    var rows = document.querySelectorAll('.member-row');
+    if (rows.length <= 1) return;
+    btn.parentElement.remove();
+    renumberMembers();
+  }
+
+  function renumberMembers() {
+    var rows = document.querySelectorAll('.member-row');
+    rows.forEach(function(r, i) {
+      var num = r.querySelector('.member-num');
+      if (num) num.textContent = String(i + 1).padStart(2,'0');
+    });
+    memberCount = rows.length;
+  }
+
+  function registerTeam() {
+    var name = document.getElementById('team-name').value.trim();
+    if (!name) {
+      var inp = document.getElementById('team-name');
+      inp.style.borderColor = 'var(--red-bright)';
+      setTimeout(function(){ inp.style.borderColor = ''; }, 1000);
+      return;
+    }
+    document.getElementById('confirm-msg').style.display = 'block';
+    if (!teamRegistered) {
+      teamRegistered = true;
+      var ct = document.getElementById('team-count');
+      ct.textContent = String(parseInt(ct.textContent || '0') + 1).padStart(2,'0');
+    }
+  }
+
+  function openModal() {
+    document.getElementById('modal-wrap').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-wrap').classList.remove('open');
+  }
+
+  function submitClaim() {
+    var val = document.getElementById('modal-team').value.trim();
+    if (!val) {
+      var inp = document.getElementById('modal-team');
+      inp.style.borderColor = 'var(--red-bright)';
+      setTimeout(function(){ inp.style.borderColor = ''; }, 1000);
+      return;
+    }
+    document.getElementById('modal-form').style.display = 'none';
+    document.getElementById('modal-success').style.display = 'block';
+  }
+
+  document.getElementById('modal-wrap').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // live elapsed timer
+  var startTime = Date.now();
+  setInterval(function() {
+    var elapsed = Math.floor((Date.now() - startTime) / 1000);
+    var h = Math.floor(elapsed / 3600);
+    var m = Math.floor((elapsed % 3600) / 60);
+    var s = elapsed % 60;
+    document.getElementById('elapsed').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+</script>
+</body>
+</html>
