@@ -584,7 +584,7 @@ footer{
             <div style="color:var(--red-bright);font-size:16px;font-family:var(--vt);">ACTIVE</div>
           </div>
           <div style="border:1px solid #1e2e1e;padding:8px 10px;">
-            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">TEAMS IN</div>
+            <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">S IN</div>
             <div style="color:var(--green-bright);font-size:16px;font-family:var(--vt);" id="team-count">00</div>
           </div>
           <div style="border:1px solid #1e2e1e;padding:8px 10px;">
@@ -606,41 +606,63 @@ footer{
   </div>
 
   <!-- REGISTRATION -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-dot"></div>
-      <div class="panel-title">Team Registration</div>
-      <span style="margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:0.2em;">SECTION 01</span>
+  <div class="panel-body">
+  <form id="registration-form"
+        action="https://formsubmit.co/0xfpf@proton.me"
+        method="POST"
+        onsubmit="return validateRegistration()">
+  
+    <!-- FormSubmit options -->
+    <input type="hidden" name="_subject" value="New Treasure Hunt Registration">
+    <input type="hidden" name="_captcha" value="false">
+  
+    <div class="field">
+      <label for="team-name">Team Designation</label>
+      <input
+        type="text"
+        id="team-name"
+        name="Team Name"
+        placeholder="Enter team callsign..."
+        required>
     </div>
-    <div class="panel-body">
-      <div class="two-col">
-        <div>
-          <div class="field">
-            <label for="team-name">Team Designation</label>
-            <input type="text" id="team-name" placeholder="Enter team callsign...">
-          </div>
-          <button class="btn" onclick="registerTeam()" style="width:100%;justify-content:center;">
-            &#9654; Confirm &amp; Register
-          </button>
-          <div class="confirm-msg" id="confirm-msg">
-            &#10003; &nbsp;Registration logged. Operative clearance: GRANTED.
-          </div>
+  
+    <div class="field">
+      <label>Team Members</label>
+  
+      <div id="members-list">
+  
+        <div class="member-row">
+          <div class="member-num">01</div>
+          <input
+            type="text"
+            name="Participant 1"
+            placeholder="Member name..."
+            required>
+          <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
         </div>
-        <div>
-          <div class="field">
-            <label>Team Members</label>
-            <div id="members-list">
-              <div class="member-row">
-                <div class="member-num">01</div>
-                <input type="text" placeholder="Member name...">
-                <button class="btn-rm" onclick="removeMember(this)">−</button>
-              </div>
-            </div>
-            <button class="add-member-btn" onclick="addMember()">+ Add Operative</button>
-          </div>
+  
+        <div class="member-row">
+          <div class="member-num">02</div>
+          <input
+            type="text"
+            name="Participant 2"
+            placeholder="Member name..."
+            required>
+          <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
         </div>
+  
       </div>
+  
+      <button type="button" class="add-member-btn" onclick="addMember()">
+        + Add Operative
+      </button>
     </div>
+  
+    <button class="btn" style="width:100%;justify-content:center;">
+      ▶ Confirm & Register
+    </button>
+  
+  </form>
   </div>
 
   <!-- RIDDLE + CIPHER (side by side) -->
@@ -717,18 +739,35 @@ footer{
       <div class="modal-header-title">Claim Protocol — Victory Declaration</div>
       <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
     </div>
-    <div id="modal-form">
-      <div class="modal-body">
-        <div class="modal-sub">State your team designation to register victory. This action is irreversible and will be logged.</div>
-        <div class="field">
-          <label for="modal-team">Team Designation</label>
-          <input type="text" id="modal-team" placeholder="Enter team callsign...">
+    <form
+    action="https://formsubmit.co/0xfpf@proton.me"
+    method="POST">
+
+    <input type="hidden" name="_subject" value="Treasure Found">
+    <input type="hidden" name="_captcha" value="false">
+
+    <div class="modal-body">
+
+        <div class="modal-sub">
+            State your team designation to register victory.
         </div>
-        <button class="btn btn-red" style="width:100%;justify-content:center;" onclick="submitClaim()">
-          &#9654; Submit Victory Claim
+
+        <div class="field">
+            <label>Team Designation</label>
+            <input
+                type="text"
+                name="Winning Team"
+                placeholder="Enter team callsign..."
+                required>
+        </div>
+
+        <button class="btn btn-red" style="width:100%;justify-content:center;">
+            ▶ Submit Victory Claim
         </button>
-      </div>
+
     </div>
+
+</form>
     <div class="modal-success" id="modal-success">
       <span class="modal-success-glyph">&#9670;</span>
       <div class="modal-success-title">Victory Confirmed</div>
@@ -740,49 +779,58 @@ footer{
 <script>
   var memberCount = 1;
   var teamRegistered = false;
-
+  
   function addMember() {
-    memberCount++;
-    var list = document.getElementById('members-list');
-    var row = document.createElement('div');
-    row.className = 'member-row';
-    row.innerHTML = '<div class="member-num">' + String(memberCount).padStart(2,'0') + '</div>' +
-      '<input type="text" placeholder="Member name...">' +
-      '<button class="btn-rm" onclick="removeMember(this)">−</button>';
-    list.appendChild(row);
-    renumberMembers();
+      memberCount++;
+  
+      var row = document.createElement("div");
+      row.className = "member-row";
+  
+      row.innerHTML =
+          '<div class="member-num">' + String(memberCount).padStart(2,'0') + '</div>' +
+          '<input type="text" name="Participant ' + memberCount +
+          '" placeholder="Member name...">' +
+          '<button type="button" class="btn-rm" onclick="removeMember(this)">−</button>';
+  
+      document.getElementById("members-list").appendChild(row);
+  
+      renumberMembers();
   }
 
   function removeMember(btn) {
-    var rows = document.querySelectorAll('.member-row');
-    if (rows.length <= 1) return;
-    btn.parentElement.remove();
-    renumberMembers();
+      var rows = document.querySelectorAll(".member-row");
+      if(rows.length <= 2) return;
+      btn.parentElement.remove();
+      renumberMembers();
   }
 
-  function renumberMembers() {
-    var rows = document.querySelectorAll('.member-row');
-    rows.forEach(function(r, i) {
-      var num = r.querySelector('.member-num');
-      if (num) num.textContent = String(i + 1).padStart(2,'0');
+  function renumberMembers(){
+      var rows=document.querySelectorAll(".member-row");
+      rows.forEach(function(r,i){
+          r.querySelector(".member-num").textContent =
+              String(i+1).padStart(2,'0');
+          r.querySelector("input").name =
+              "Participant " + (i+1);
+      });
+      memberCount=rows.length;
+  }
+
+  function validateRegistration(){
+    var team=document.getElementById("team-name").value.trim();
+    if(team===""){
+        alert("Enter a team name.");
+        return false;
+    }
+    var filled=0;
+    document.querySelectorAll("#members-list input").forEach(function(input){
+        if(input.value.trim()!=="")
+            filled++;
     });
-    memberCount = rows.length;
-  }
-
-  function registerTeam() {
-    var name = document.getElementById('team-name').value.trim();
-    if (!name) {
-      var inp = document.getElementById('team-name');
-      inp.style.borderColor = 'var(--red-bright)';
-      setTimeout(function(){ inp.style.borderColor = ''; }, 1000);
-      return;
+    if(filled<2){
+        alert("At least two participants are required.");
+        return false;
     }
-    document.getElementById('confirm-msg').style.display = 'block';
-    if (!teamRegistered) {
-      teamRegistered = true;
-      var ct = document.getElementById('team-count');
-      ct.textContent = String(parseInt(ct.textContent || '0') + 1).padStart(2,'0');
-    }
+    return true;
   }
 
   function openModal() {
@@ -792,22 +840,6 @@ footer{
   function closeModal() {
     document.getElementById('modal-wrap').classList.remove('open');
   }
-
-  function submitClaim() {
-    var val = document.getElementById('modal-team').value.trim();
-    if (!val) {
-      var inp = document.getElementById('modal-team');
-      inp.style.borderColor = 'var(--red-bright)';
-      setTimeout(function(){ inp.style.borderColor = ''; }, 1000);
-      return;
-    }
-    document.getElementById('modal-form').style.display = 'none';
-    document.getElementById('modal-success').style.display = 'block';
-  }
-
-  document.getElementById('modal-wrap').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
 
   // live elapsed timer
   var startTime = Date.now();
