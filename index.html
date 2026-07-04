@@ -618,6 +618,7 @@ footer{
   
     <div class="field">
       <label for="team-name">Team Designation</label>
+      <input type="hidden" name="Form" value="Team Registration">
       <input
         type="text"
         id="team-name"
@@ -740,7 +741,8 @@ footer{
       <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
     </div>
     <form
-    action="https://formsubmit.co/0xfpf@proton.me"
+    id="claim-form"
+    action="https://formsubmit.co/ajax/0xfpf@proton.me"
     method="POST">
 
     <input type="hidden" name="_subject" value="Treasure Found">
@@ -754,6 +756,7 @@ footer{
 
         <div class="field">
             <label>Team Designation</label>
+            <input type="hidden" name="Form" value="Victory Claim">
             <input
                 type="text"
                 name="Winning Team"
@@ -767,7 +770,7 @@ footer{
 
     </div>
 
-</form>
+    </form>
     <div class="modal-success" id="modal-success">
       <span class="modal-success-glyph">&#9670;</span>
       <div class="modal-success-title">Victory Confirmed</div>
@@ -852,5 +855,63 @@ footer{
       String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }, 1000);
 </script>
+  
+<script>
+  document.getElementById("registration-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!validateRegistration()) return;
+
+    const form = this;
+    const data = new FormData(form);
+
+    try {
+        await fetch(form.action, {
+            method: "POST",
+            body: data
+        });
+
+        // Update your UI
+        document.getElementById("confirm-msg").style.display = "block";
+
+        var ct = document.getElementById("team-count");
+        ct.textContent = String(Number(ct.textContent)+1).padStart(2,"0");
+
+        // Display the team name somewhere
+        document.querySelector(".status-team").textContent =
+            document.getElementById("team-name").value;
+
+        form.reset();
+
+    } catch(err) {
+        alert("Failed to submit registration.");
+    }
+  });
+  </script>
+
+
+  <script>
+    document.getElementById("claim-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+    
+        const form = this;
+    
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: new FormData(form)
+            });
+    
+            if (!response.ok) throw new Error();
+    
+            document.getElementById("modal-form").style.display = "none";
+            document.getElementById("modal-success").style.display = "block";
+    
+        } catch {
+            alert("Failed to submit claim.");
+        }
+    });
+  </script>
+  
 </body>
 </html>
