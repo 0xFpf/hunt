@@ -784,6 +784,14 @@ footer{
                 name="Winning Team"
                 placeholder="Enter team callsign..."
                 required>
+          <div class="field">
+            <label>What did you find?</label>
+            <input
+                type="text"
+                name="Found Item"
+                placeholder="Describe the treasure..."
+                required>
+          </div>
         </div>
 
         <button class="btn btn-red" style="width:100%;justify-content:center;">
@@ -800,6 +808,7 @@ footer{
       <span class="modal-success-glyph">&#9670;</span>
       <div class="modal-success-title">Victory Confirmed</div>
       <div class="modal-success-sub">// Your conquest has been recorded, operative. Well played. //</div>
+      <button class="modal-close" onclick="closeModal(); resetModal()" aria-label="Close">&times;</button>
     </div>
   </div>
 </div>
@@ -807,6 +816,18 @@ footer{
   <div class="shutdown-text">TREASURE HUNT FINISHED</div>
 </div>
 
+<script>
+  function resetModal() {
+    const form = document.getElementById("claim-form");
+    form.querySelector(".modal-body").style.display = "block";
+
+    const success = document.getElementById("modal-success");
+    success.style.display = "none";
+
+    form.reset();
+}
+</script>
+  
 <script>
   let registrationLocked = false;
   var memberCount = 1;
@@ -1016,6 +1037,39 @@ setInterval(checkShutdown, 60000);
       registrationLocked = false;
       alert("Submission failed. Try again.");
   }
+});
+</script>
+
+<script>
+  document.getElementById("claim-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const data = new FormData(form);
+
+    try {
+        await fetch(form.action, {
+            method: "POST",
+            body: data
+        });
+
+        // Hide form body
+        form.querySelector(".modal-body").style.display = "none";
+
+        // Show success screen
+        const success = document.getElementById("modal-success");
+        success.style.display = "block";
+
+        // Override text
+        success.querySelector(".modal-success-title").textContent =
+            "Congratulations Operatives";
+
+        success.querySelector(".modal-success-sub").textContent =
+            "Your claim has been logged. Mission complete.";
+
+    } catch (err) {
+        alert("Submission failed. Try again.");
+    }
 });
 </script>
   
