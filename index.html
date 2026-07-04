@@ -627,71 +627,79 @@ footer{
     </div>
   </div>
 
-  <!-- REGISTRATION -->
-  <div class="panel-body">
-  <form id="registration-form"
-        action="https://formsubmit.co/0xfpf@proton.me"
-        method="POST"
-        onsubmit="return validateRegistration()">
-  
-    <!-- FormSubmit options -->
-    <input type="hidden" name="_subject" value="New Treasure Hunt Registration">
-    <input type="hidden" name="_captcha" value="false">
-  
-    <div class="field">
-      <label for="team-name">Team Designation</label>
-      <input type="hidden" name="Form" value="Team Registration">
-      <input
-        type="text"
-        id="team-name"
-        name="Team Name"
-        placeholder="Enter team callsign..."
-        required>
+  <!-- SECTION 01 -->
+  <div class="panel green-border">
+    <div class="panel-header">
+      <div class="panel-dot"></div>
+      <div class="panel-title">Operative Registration</div>
+      <span style="margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:0.2em;">SECTION 01</span>
     </div>
   
-    <div class="field">
-      <label>Team Members</label>
+    <div class="panel-body">
+      <form id="registration-form"
+            action="https://formsubmit.co/0xfpf@proton.me"
+            method="POST"
+            onsubmit="return validateRegistration()">
   
-      <div id="members-list">
+        <!-- FormSubmit options -->
+        <input type="hidden" name="_subject" value="New Treasure Hunt Registration">
+        <input type="hidden" name="_captcha" value="false">
   
-        <div class="member-row">
-          <div class="member-num">01</div>
+        <div class="field">
+          <label for="team-name">Team Designation</label>
+          <input type="hidden" name="Form" value="Team Registration">
           <input
             type="text"
-            name="Participant 1"
-            placeholder="Member name..."
+            id="team-name"
+            name="Team Name"
+            placeholder="Enter team callsign..."
             required>
-          <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
         </div>
   
-        <div class="member-row">
-          <div class="member-num">02</div>
-          <input
-            type="text"
-            name="Participant 2"
-            placeholder="Member name..."
-            required>
-          <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
+        <div class="field">
+          <label>Team Members</label>
+  
+          <div id="members-list">
+  
+            <div class="member-row">
+              <div class="member-num">01</div>
+              <input
+                type="text"
+                name="Participant 1"
+                placeholder="Member name..."
+                required>
+              <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
+            </div>
+  
+            <div class="member-row">
+              <div class="member-num">02</div>
+              <input
+                type="text"
+                name="Participant 2"
+                placeholder="Member name..."
+                required>
+              <button type="button" class="btn-rm" onclick="removeMember(this)">−</button>
+            </div>
+  
+          </div>
+  
+          <button type="button" class="add-member-btn" onclick="addMember()">
+            + Add Operative
+          </button>
         </div>
   
-      </div>
+        <button class="btn" style="width:100%;justify-content:center;">
+          ▶ Confirm &amp; Register
+        </button>
   
-      <button type="button" class="add-member-btn" onclick="addMember()">
-        + Add Operative
-      </button>
+        <div id="confirm-msg" class="confirm-msg">
+          Registration submitted<br>
+          <span id="welcome-msg"></span>
+        </div>
+  
+      </form>
     </div>
-  
-    <button class="btn" style="width:100%;justify-content:center;">
-      ▶ Confirm & Register
-    </button>
-    <div id="confirm-msg" class="confirm-msg">
-      Registration submitted<br>
-      <span id="welcome-msg"></span>
-    </div>
-  
-  </form>
   </div>
-
   <!-- RIDDLE + CIPHER (side by side) -->
   <div class="two-col">
 
