@@ -586,7 +586,7 @@ footer{
           <div class="face f">※</div>
           <div class="face ba">₿</div>
           <div class="face r">◈</div>
-          <div class="face l">✦</div>
+          <div class="face l">₿</div>
           <div class="face t">⌬</div>
           <div class="face bo">⬡</div>
         </div>
@@ -684,6 +684,9 @@ footer{
     <button class="btn" style="width:100%;justify-content:center;">
       ▶ Confirm & Register
     </button>
+    <div id="confirm-msg" class="confirm-msg">
+      Registration submitted.
+    </div>
   
   </form>
   </div>
@@ -789,10 +792,13 @@ footer{
         <button class="btn btn-red" style="width:100%;justify-content:center;">
             ▶ Submit Victory Claim
         </button>
-
+      <div id="confirm-msg" class="confirm-msg">
+        Registration submitted.
+      </div>
     </div>
 
     </form>
+    
     <div class="modal-success" id="modal-success">
       <span class="modal-success-glyph">&#9670;</span>
       <div class="modal-success-title">Victory Confirmed</div>
@@ -950,49 +956,14 @@ checkShutdown();
 setInterval(checkShutdown, 60000);
 </script>
   
-<script>
-  document.getElementById("registration-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    if (!validateRegistration()) return;
-
-    const form = this;
-    const data = new FormData(form);
-
-    try {
-        await fetch(form.action, {
-            method: "POST",
-            body: data
-        });
-
-        // Update your UI
-        document.getElementById("confirm-msg").style.display = "block";
-
-        var ct = document.getElementById("team-count");
-        ct.textContent = String(Number(ct.textContent)+1).padStart(2,"0");
-
-        // Display the team name somewhere
-        document.querySelector(".status-team").textContent =
-            document.getElementById("team-name").value;
-
-        form.reset();
-
-    } catch(err) {
-        alert("Failed to submit registration.");
-    }
-  });
-  </script>
-
-
   <script>
     document.getElementById("registration-form").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     if (registrationLocked) return;
-
     if (!validateRegistration()) return;
 
-    registrationLocked = true; // lock immediately
+    registrationLocked = true;
 
     const form = this;
 
@@ -1003,20 +974,20 @@ setInterval(checkShutdown, 60000);
             mode: "no-cors"
         });
 
-        document.getElementById("confirm-msg").style.display = "block";
+        const msg = document.getElementById("confirm-msg");
+        if (msg) msg.style.display = "block";
 
-        var ct = document.getElementById("team-count");
+        const ct = document.getElementById("team-count");
         ct.textContent = String(Number(ct.textContent) + 1).padStart(2, "0");
 
         form.reset();
 
-        // disable inputs so they can't resubmit
         form.querySelectorAll("input, button").forEach(el => {
             el.disabled = true;
         });
 
     } catch (err) {
-        registrationLocked = false; // unlock only if it actually failed
+        registrationLocked = false;
         alert("Submission failed. Try again.");
     }
   });
