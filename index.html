@@ -492,6 +492,30 @@ footer{
   display:flex;justify-content:space-between;
   font-size:10px;color:var(--muted);letter-spacing:0.2em;
 }
+
+#shutdown-overlay{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+}
+
+.shutdown-text{
+  color:#ff3300;
+  font-family:var(--vt);
+  font-size:clamp(24px,5vw,64px);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  animation: flicker 1.2s infinite;
+}
+
+@keyframes flicker {
+  0%,100%{opacity:1;}
+  50%{opacity:0.4;}
+}
 </style>
 </head>
 <body>
@@ -504,7 +528,7 @@ footer{
     <span>OPERATIVES <span class="amber">UNKNOWN</span></span>
     <span>CIPHER <span class="cyan">LEVEL 3</span></span>
     <span>OBJECT <span class="green">UNRECOVERED</span></span>
-    <span>TIMER <span class="red">RUNNING</span></span>
+    <span> <span class="red">RUNNING</span></span>
     <span>SIGNAL <span class="amber">WEAK</span></span>
     <span>THREAT <span class="red">MODERATE</span></span>
     <span>NODE <span class="cyan">7 OF 7 LOCKED</span></span>
@@ -513,7 +537,7 @@ footer{
     <span>OPERATIVES <span class="amber">UNKNOWN</span></span>
     <span>CIPHER <span class="cyan">LEVEL 3</span></span>
     <span>OBJECT <span class="green">UNRECOVERED</span></span>
-    <span>TIMER <span class="red">RUNNING</span></span>
+    <span> <span class="red">RUNNING</span></span>
     <span>SIGNAL <span class="amber">WEAK</span></span>
     <span>THREAT <span class="red">MODERATE</span></span>
     <span>NODE <span class="cyan">7 OF 7 LOCKED</span></span>
@@ -528,9 +552,7 @@ footer{
       <div class="logo-sub">v1.0 // FIELD OPERATIVE MODE</div>
     </div>
     <div class="nav-pills">
-      <div class="pill active">HUNT</div>
-      <div class="pill">LOG</div>
-      <div class="pill red-pill">CLAIM</div>
+      <div class="pill active">YOUR MISSION, SHOULD YOU CHOOSE TO ACCEPT IT</div>
     </div>
   </div>
   <div class="topnav-right">
@@ -778,8 +800,12 @@ footer{
     </div>
   </div>
 </div>
+<div id="shutdown-overlay">
+  <div class="shutdown-text">TREASURE HUNT FINISHED</div>
+</div>
 
 <script>
+  let registrationLocked = false;
   var memberCount = 1;
   var teamRegistered = false;
   
@@ -845,15 +871,83 @@ footer{
   }
 
   // live elapsed timer
-  var startTime = Date.now();
+  function getStartOfTodayAt21() {
+      const now = new Date();
+      // force London timezone handling via local browser time
+      const start = new Date(now);
+      start.setHours(21, 0, 0, 0); // 9:00:00 PM today
+      // if it's already past 9pm, optionally push to next day
+      if (now > start) {
+          start.setDate(start.getDate() + 1);
+      }
+      return start.getTime();
+  }
+  var startTime = getStartOfTodayAt21();
+
   setInterval(function() {
     var elapsed = Math.floor((Date.now() - startTime) / 1000);
     var h = Math.floor(elapsed / 3600);
     var m = Math.floor((elapsed % 3600) / 60);
     var s = elapsed % 60;
+
     document.getElementById('elapsed').textContent =
-      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-  }, 1000);
+      String(h).padStart(2,'0') + ':' +
+      String(m).padStart(2,'0') + ':' +
+      String(s).padStart(2,'0');
+}, 1000);
+
+  function getCutoffTime() {
+    const now = new Date();
+    const cutoff = new Date(now);
+
+    cutoff.setHours(5, 0, 0, 0); // 05:00 AM
+
+    // if it's already past 5am, lock immediately (or next day depending on logic)
+    if (now > cutoff) {
+        return true;
+    }
+
+    return false;
+}
+
+function isShutdownTime() {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+
+    const currentMinutes = hour * 60 + minute;
+
+    const start = 5 * 60;   // 05:00
+    const end   = 18 * 60;  // 18:00 (6pm)
+
+    return currentMinutes >= start && currentMinutes < end;
+}
+
+function checkShutdown() {
+    if (isShutdownTime()) {
+        document.getElementById("shutdown-overlay").style.display = "flex";
+        document.body.style.overflow = "hidden";
+
+        document.querySelectorAll("button, input, a").forEach(el => {
+            el.disabled = true;
+            el.style.pointerEvents = "none";
+        });
+    } else {
+        document.getElementById("shutdown-overlay").style.display = "none";
+        document.body.style.overflow = "";
+
+        document.querySelectorAll("button, input, a").forEach(el => {
+            el.disabled = false;
+            el.style.pointerEvents = "";
+        });
+    }
+}
+
+// run immediately
+checkShutdown();
+
+// optional safety re-check every minute
+setInterval(checkShutdown, 60000);
 </script>
   
 <script>
@@ -891,26 +985,41 @@ footer{
 
 
   <script>
-    document.getElementById("claim-form").addEventListener("submit", async function(e) {
-        e.preventDefault();
-    
-        const form = this;
-    
-        try {
-            const response = await fetch(form.action, {
-                method: "POST",
-                body: new FormData(form)
-            });
-    
-            if (!response.ok) throw new Error();
-    
-            document.getElementById("modal-form").style.display = "none";
-            document.getElementById("modal-success").style.display = "block";
-    
-        } catch {
-            alert("Failed to submit claim.");
-        }
-    });
+    document.getElementById("registration-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (registrationLocked) return;
+
+    if (!validateRegistration()) return;
+
+    registrationLocked = true; // lock immediately
+
+    const form = this;
+
+    try {
+        await fetch(form.action, {
+            method: "POST",
+            body: new FormData(form),
+            mode: "no-cors"
+        });
+
+        document.getElementById("confirm-msg").style.display = "block";
+
+        var ct = document.getElementById("team-count");
+        ct.textContent = String(Number(ct.textContent) + 1).padStart(2, "0");
+
+        form.reset();
+
+        // disable inputs so they can't resubmit
+        form.querySelectorAll("input, button").forEach(el => {
+            el.disabled = true;
+        });
+
+    } catch (err) {
+        registrationLocked = false; // unlock only if it actually failed
+        alert("Submission failed. Try again.");
+    }
+  });
   </script>
   
 </body>
