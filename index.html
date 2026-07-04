@@ -608,7 +608,7 @@ footer{
           </div>
           <!-- <div style="border:1px solid #1e2e1e;padding:8px 10px;">
             <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">S IN</div>
-            <div style="color:var(--green-bright);font-size:16px;font-family:var(--vt);" id="team-count">00</div>
+            <div style="color:var(--green-bright);font-size:16px;font-family:var(--vt);" id="">00</div>
           </div>
           <div style="border:1px solid #1e2e1e;padding:8px 10px;">
             <div style="font-size:10px;color:var(--muted);letter-spacing:0.2em;margin-bottom:4px;">CLUES ACTIVE</div>
@@ -805,7 +805,7 @@ footer{
         <button class="btn btn-red" style="width:100%;justify-content:center;">
             ▶ Submit Victory Claim
         </button>
-      <div id="confirm-msg" class="confirm-msg">
+      <div id="confirm-msg-victory" class="confirm-msg">
         Registration submitted.
       </div>
     </div>
@@ -1033,7 +1033,9 @@ setInterval(checkShutdown, 60000);
       if (msg) msg.style.display = "block";
 
       const ct = document.getElementById("team-count");
-      ct.textContent = String(Number(ct.textContent) + 1).padStart(2, "0");
+      if (ct) {
+        ct.textContent = String(Number(ct.textContent) + 1).padStart(2, "0");
+      }
 
       form.reset();
 
