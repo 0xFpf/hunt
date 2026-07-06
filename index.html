@@ -821,7 +821,7 @@ footer{
   </div>
 </div>
 <div id="shutdown-overlay">
-  <div class="shutdown-text">TREASURE HUNT FINISHED.</div>
+  <div class="shutdown-text">TREASURE HUNT FINISHED</div>
 </div>
 
 <script>
@@ -942,36 +942,22 @@ footer{
     return false;
 }
 
-function isShutdownTime() {
+function isBusinessHours() {
     const now = new Date();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
+    const minutes = now.getHours() * 60 + now.getMinutes();
 
-    const currentMinutes = hour * 60 + minute;
-
-    const start = 5 * 60;   // 05:00
-    const end   = 6 * 60;  // 18:00 (6pm)
-
-    return currentMinutes >= start && currentMinutes < end;
+    return minutes >= 5 * 60 && minutes < 18 * 60;
 }
 
 function checkShutdown() {
-    if (isShutdownTime()) {
-        document.getElementById("shutdown-overlay").style.display = "flex";
+    const overlay = document.getElementById("shutdown-overlay");
+
+    if (!isBusinessHours()) {
+        overlay.style.display = "flex";
         document.body.style.overflow = "hidden";
-
-        document.querySelectorAll("button, input, a").forEach(el => {
-            el.disabled = true;
-            el.style.pointerEvents = "none";
-        });
     } else {
-        document.getElementById("shutdown-overlay").style.display = "none";
+        overlay.style.display = "none";
         document.body.style.overflow = "";
-
-        document.querySelectorAll("button, input, a").forEach(el => {
-            el.disabled = false;
-            el.style.pointerEvents = "";
-        });
     }
 }
 
