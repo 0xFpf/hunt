@@ -907,7 +907,7 @@ footer{
       const now = new Date();
       // force London timezone handling via local browser time
       const start = new Date(now);
-      start.setHours(21, 0, 0, 0); // 9:00:00 PM today
+      start.setHours(8, 0, 0, 0); // 9:00:00 PM today
       // if it's already past 9pm, optionally push to next day
       if (now > start) {
           start.setDate(start.getDate() + 1);
@@ -932,7 +932,7 @@ footer{
     const now = new Date();
     const cutoff = new Date(now);
 
-    cutoff.setHours(20, 0, 0, 0); // 05:00 AM
+    cutoff.setHours(5, 0, 0, 0); // 05:00 AM
 
     // if it's already past 5am, lock immediately (or next day depending on logic)
     if (now > cutoff) {
