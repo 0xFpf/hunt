@@ -950,7 +950,7 @@ function isShutdownTime() {
     const currentMinutes = hour * 60 + minute;
 
     const start = 5 * 60;   // 05:00
-    const end   = 18 * 60;  // 18:00 (6pm)
+    const end   = 6 * 60;  // 18:00 (6pm)
 
     return currentMinutes >= start && currentMinutes < end;
 }
