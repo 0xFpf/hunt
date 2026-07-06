@@ -638,7 +638,7 @@ footer{
   
     <div class="panel-body">
       <form id="registration-form"
-            action="https://formsubmit.co/0xfpf@proton.me"
+            action="https://formsubmit.co/"
             method="POST"
             onsubmit="return validateRegistration()">
   
@@ -932,7 +932,7 @@ footer{
     const now = new Date();
     const cutoff = new Date(now);
 
-    cutoff.setHours(5, 0, 0, 0); // 05:00 AM
+    cutoff.setHours(20, 0, 0, 0); // 05:00 AM
 
     // if it's already past 5am, lock immediately (or next day depending on logic)
     if (now > cutoff) {
